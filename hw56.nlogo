@@ -1,30 +1,69 @@
+;William Vongphanith, Stanley Zheng
+;IntroCS pd6 sec10
+;HW56 - Patchwork
+;2021-1-12
+
+globals [
+  coverage-percent
+  num-of-patches-coverage
+  coverage-percent2
+  num-of-patches-coverage2
+  covered
+  agentset
+  covered2
+]
+
+to startup ;runs this on import
+  setup
+end
+
 to setup
-  ca
-  cp
+  ca  ;clear all
+  cp  ;clear patches, as second line of defense
+  crt 1 [set size 0.1] ;creates a turtle for the purpose of sprinkle2
 end
 
 to patch-setup
-  set pcolor black
+  set pcolor black ;set all patches to black, their original state.
 end
 
 to checkerboard
-  ;if both odd or both even set color to one
-  if pxcor mod 2 = 0 and pycor mod 2 = 0
+  if pxcor mod 2 = 0 and pycor mod 2 = 0  ;if both coordinates are even set color to first specified color
   [set pcolor checker-color-1]
-  if pxcor mod 2 = 1 and pycor mod 2 = 1
+  if pxcor mod 2 = 1 and pycor mod 2 = 1  ;if both coordinates are odd set color to first specified color
   [set pcolor checker-color-1]
-  ;if both are different then set color to the other
-  if pxcor mod 2 = 0 and pycor mod 2 = 1
+  if pxcor mod 2 = 0 and pycor mod 2 = 1  ;if one coordinate is odd and one is even set to the other color
   [set pcolor checker-color-2]
-  if pxcor mod 2 = 1 and pycor mod 2 = 0
+  if pxcor mod 2 = 1 and pycor mod 2 = 0  ;if one coordinate is odd and one is even set to the other color
   [set pcolor checker-color-2]
 end
 
 to sprinkle
-  ;ask n-of (p-red * count patches) patches [ set pcolor red ]
-  ;ask patches with [ pcolor != red ] [ set pcolor green ]
-  ;the easiest solution, but we can't use ask so
+  ifelse random 100 <= coverage [set pcolor coverage-color-1][set pcolor black]  ;requests a random number for each patch, then if the number is less than the coverage percent, set the patch color to the specified color
 end
+
+to cuatroColores
+  set pcolor (random 4) * 20 + 25  ;chooses a random number from 1 to 4 (for each of 4 colors) then transforms it so it looks better. then sets patch color to it.
+end
+;================================================================================================
+to helper
+loop [
+    setxy random-xcor random-ycor
+    set pcolor coverage-color-1
+    set covered count patches with [pcolor = coverage-color-1]
+    if covered >= num-of-patches-coverage [die]
+  ]
+end
+
+to sprinkle2
+  set covered count patches with [pcolor = coverage-color-1]
+  set coverage-percent coverage / 100
+  set num-of-patches-coverage (round (coverage-percent * count patches) + covered)
+  hatch 1 [helper
+    ]
+  show covered
+end
+;always gets the exact percentage of patches, but you need to press setup beforehand
 @#$#@#$#@
 GRAPHICS-WINDOW
 4
@@ -51,7 +90,7 @@ GRAPHICS-WINDOW
 0
 1
 ticks
-30.0
+60.0
 
 BUTTON
 450
@@ -105,16 +144,16 @@ NIL
 1
 
 BUTTON
-450
-125
-524
-159
+449
+200
+529
+235
 NIL
-sprinkle\n
+sprinkle2
 NIL
 1
 T
-PATCH
+TURTLE
 NIL
 NIL
 NIL
@@ -139,138 +178,214 @@ NIL
 1
 
 SLIDER
-593
-10
-766
-44
+445
+297
+618
+330
 coverage
 coverage
 0
 100
-50.0
+36.0
 1
 1
-NIL
+%
 HORIZONTAL
 
 MONITOR
-594
-51
-674
-96
-NIL
-actualCount
+792
+39
+924
+84
+Orange Patches
+count patches with [pcolor = 25]
 17
 1
 11
 
 MONITOR
-593
-99
-683
-144
-NIL
-percentCount
-17
+792
+86
+924
+131
+Orange Patches Percent
+100 * (count patches with [pcolor = 25]) / (count patches)
+3
 1
 11
 
 SLIDER
-591
-153
-764
-187
+446
+334
+619
+367
 checker-color-1
 checker-color-1
 0
 140
-94.0
+107.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-590
-192
-763
-226
-checker-color-2
-checker-color-2
-0
-140
-41.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-591
-228
-764
-262
+446
+409
+619
+442
 coverage-color-1
 coverage-color-1
 0
 140
-50.0
+77.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-590
-268
-763
-302
-coverage-color-2
-coverage-color-2
+445
+373
+618
+406
+checker-color-2
+checker-color-2
 0
 140
-50.0
+86.0
 1
 1
 NIL
 HORIZONTAL
+
+BUTTON
+451
+125
+525
+159
+NIL
+sprinkle
+NIL
+1
+T
+PATCH
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+493
+273
+577
+291
+Preferences
+14
+0.0
+1
+
+MONITOR
+658
+39
+790
+84
+Yellow Patches
+count patches with [pcolor = 45]
+17
+1
+11
+
+MONITOR
+658
+86
+790
+131
+Yellow Patches Percent
+100 * (count patches with [pcolor = 45]) / (count patches)
+3
+1
+11
+
+MONITOR
+658
+133
+790
+178
+Green Patches
+count patches with [pcolor = 65]
+17
+1
+11
+
+MONITOR
+658
+178
+790
+223
+Green Patches Percent
+100 * (count patches with [pcolor = 65]) / (count patches)
+3
+1
+11
+
+MONITOR
+792
+133
+924
+178
+Turquoise Patches
+count patches with [pcolor = 85]
+17
+1
+11
+
+MONITOR
+792
+178
+924
+223
+Turquoise Patches Percent
+100 * (count patches with [pcolor = 85]) / (count patches)
+3
+1
+11
+
+TEXTBOX
+765
+18
+849
+36
+Monitors
+16
+0.0
+1
 
 @#$#@#$#@
+# HW56
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This model helps apply the properties of patches (and turtles, in sprinkle2) to create and show the ways we can manipulate patches.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+All functions use patch context to send commands only to patches. The patches look as if they moved because we apply the pcolor function, which changes a patch's (or all patches') color. We also included another method of changing patch color according to a specific method by using turtles, with their ability to move, and their ability to detect and change patch colors that they sit on.
 
 ## HOW TO USE IT
-
-(how to use the model, including a description of each of the items in the Interface tab)
-
-## THINGS TO NOTICE
-
-(suggested things for the user to notice while running the model)
-
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+There are several buttons that are clickable that allow you to interact with the patches.
+**`setup`** clears the world then spawns an invisible turtle (neccessary for **`sprinkle2`**)
+**`patch-setup`** sets all patches to the black color, the initial state.
+**`checkerboard`** takes two colors (**`checker-color-1`** and **`checker-color-2`**) and uses their values to make a checkerboard.
+**`sprinkle`** takes a single color (**`coverage-color-1`**) and uses its value, along with the percentage covered given in **`coverage`** to cover approximately that amount of the board with the specified color.
+**`cuatroColors`** fills the board with 4 different colors, with approximately a 25% chance of each color. There are monitors that display the count of each color and the percent that the color has on the board.
+**`sprinkles2`** is a different version of **`sprinkles`**. It uses a turtle to move randomly to detect random spots on the board, moving until the number of spots covered is exactly the percentage specified in coverage. The upside of this version is that it covers an exact number of patches (instead of approximately). Sprinkles2 can also stack, meaning you can press the button more than once. Pressing it after the world has 100% patches will cause a lot of memory usage! Go to tools and press **`halt`** to prevent this if it happens.
 
 ## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+William Vongphanith, Stanley Zheng
+IntroCS pd6 sec10
+HW56 - Patchwork
+2021-1-12
 @#$#@#$#@
 default
 true
